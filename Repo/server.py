@@ -15,38 +15,41 @@ def load_data_base(data_base):
 	
 def validate(conn):
 	attempts_left = 3
-	message_type = {'send': '1', 'recv': '-1', 'valid': '0', 'invalid': '2'}
 	
 	packet_size = 1024
-	conn.send((message_type['send']).encode('utf-8'))
+	message_type = {'Invalid Credentials': bytes([1]), 
+					'Valid Credentials': bytes([2]),
+					'Reject': bytes([3])}
+					
 	while attempts_left > 0:
-		init = conn.recv(packet_size).decode('utf-8')
-		if init == message_type['recv']:
-			conn.send('user: '.encode('utf-8'))
-			user_name = conn.recv(packet_size).decode('utf-8')
-			
-			conn.send('password: '.encode('utf-8'))
-			password = conn.recv(packet_size).decode('utf-8')
-			
-			try:
-				if data_base[user_name] == password:
-					conn.send((message_type['valid']).encode('utf-8'))
-					return True
+		username = conn.recv(packet_size).decode('utf-8')
+		password = conn.recv(packet_size).decode('utf-8')
+		
+		try:
+			if data_base[username] == password:
+				conn.send(message_type['Valid Credentials'])
+				break
+			else:
+				attempts_left -= 1 
+				if attempts_left == 0:
+					conn.send(message_type['Reject'])
 				else:
-					conn.send(message_type['invalid'].encode('utf-8'))
-					attempts_left -= 1 
-			except KeyError:
-				conn.send(massage_type['invalid'].encode(''))
-				attempts_left -= 1
-			
+					conn.send(message_type['Invalid Credentials'])
+		except KeyError:
+				attempts_left -= 1 
+				if attempts_left == 0:
+					conn.send(message_type['Reject'])
+				else:
+					conn.send(message_type['Invalid Credentials'])
+	
+	if attempts_left > 0:
+		session(conn)
+	else:
+		conn.close()
 
 def session(conn):
 	packet_size = 1024
-	ascii_armoring = input('Do you want ascii amoring?(y/n) ')
-	if(ascii_armoring.lower == 'y'):
-		pass
-	else:
-		pass
+	pass
 		
 
 

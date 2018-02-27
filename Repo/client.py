@@ -1,39 +1,48 @@
 import socket, encoding
 
-def validation(s):
+def validation(conn):
 	packet_size = 1024
-	message_type = {'send': '1', 'recv': '-1', 'valid': '0', 'invalid': '2'}
-	while True:
-		init = s.recv(packet_size).decode('utf-8')
-		# We are going to accept a message
-		# Otherwise we are sending data
-		if init == message_type['send']:
-			# if you wanna send me data 
-			# I'm telling you I wanna recieve data
-			s.send(message_type['recv'].encode('utf-8'))
-			
-			user_prompt = s.recv(packet_size).decode('utf-8')
-			user_name = input(user_prompt).encode('utf-8')
-			s.send(user_name)
-			
-			password_prompt = s.recv(packet_size).decode('utf-8')
-			password = input(password_prompt).encode('utf-8')
-			s.send(password)
-			
-			response = s.recv(packet_size).decode('utf-8')
-			if response == message_type['valid']:
-				command_input(s, user_name.decode('utf-8'), packet_size)
-				return
-			elif response == message_type['invalid']:
-				s.send(message_type['recv'].encode('utf-8'))
-			elif response == message_type['out']:
-				return
-			
-			 
+	
+	message_type = {'Invalid Credentials': bytes([1]), 
+					'Valid Credentials': bytes([2]),
+					'Reject': bytes([3])}
+	
+	
+	signed_in = False
+	rejected = False
+	
+	while signed_in == False and rejected == False:
+		# Ask for username
+		username = input('user: ')
+		conn.send(username.encode('utf-8'))
 		
+		# Ask for user password
+		password = input('password: ')
+		conn.send(password.encode('utf-8'))
+		
+		response = conn.recv(packet_size)
+		if response == message_type['Valid Credentials']:
+			signed_in = True
+		elif response == message_type['Invalid Credentials']:
+			print ('Invalid Credentials')
+			continue
+		elif response == message_type['Reject']:
+			rejected = True
+			
+	if signed_in == True:
+		print ('You are signed in!!!')
+		command_input(conn, username)
+	elif rejected == True:
+		print ('You ran out of attempts')
+		conn.close()
+	
 
-def command_input(conn, user_name, packet_size):
+
+def command_input(conn, user_name):
+	packet_size = 1024
 	pass
+	
+		
 		
 
 s = socket.socket()
