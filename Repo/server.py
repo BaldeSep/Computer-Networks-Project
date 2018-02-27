@@ -11,15 +11,15 @@ def load_data_base(data_base):
 		
 		data_base[user_name] = password
 	
-	f.close()
+	f.close() 
 	
 def validate(conn):
 	attempts_left = 3
-	
 	packet_size = 1024
+	
 	message_type = {'Invalid Credentials': bytes([1]), 
 					'Valid Credentials': bytes([2]),
-					'Reject': bytes([3])}
+					'Reject': bytes([3])} 
 					
 	while attempts_left > 0:
 		username = conn.recv(packet_size).decode('utf-8')
@@ -48,8 +48,18 @@ def validate(conn):
 		conn.close()
 
 def session(conn):
+	message_type = {'ascii-yes': bytes([1]),
+					'ascii-no': bytes([2]),}
+	
 	packet_size = 1024
-	pass
+	
+	ascii_amoring = input('Do you want ascii amoring?(y/n)?: ')
+	if ascii_amoring == 'y':
+		conn.send(message_type['ascii-yes'])
+	else:
+		conn.send(message_type['ascii-no'])
+		
+	conn.close()
 		
 
 

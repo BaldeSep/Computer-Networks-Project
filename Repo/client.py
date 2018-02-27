@@ -25,7 +25,6 @@ def validation(conn):
 			signed_in = True
 		elif response == message_type['Invalid Credentials']:
 			print ('Invalid Credentials')
-			continue
 		elif response == message_type['Reject']:
 			rejected = True
 			
@@ -39,8 +38,17 @@ def validation(conn):
 
 
 def command_input(conn, user_name):
+	message_type = {'ascii-yes': bytes([1]),
+					'ascii-no': bytes([2]),}
 	packet_size = 1024
-	pass
+	
+	ascii_amoring = conn.recv(packet_size)
+	if ascii_amoring == message_type['ascii-yes']:
+		print ('Yes to ascii amroing!!!')
+	elif ascii_amoring == message_type['ascii-no']:
+		print ('No to ascii amoring!!!')
+
+	conn.close()
 	
 		
 		
