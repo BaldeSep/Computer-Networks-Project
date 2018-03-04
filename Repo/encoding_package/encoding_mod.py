@@ -1,14 +1,16 @@
 import base64
 
 class encoder():
-	def key_is_shorter_than_data(self, data, key):
-		return (len(key) < len(data))
 
 	# XOR
 	def xor_c(self, data, key):
+		
+		while len(key) < len(data):
+			key = key + key
+		
 			
 		encode_decode = bytearray()
-
+		
 		
 		for byte in range(len(data)):
 			encode_decode.append(data[byte] ^ key[byte])
