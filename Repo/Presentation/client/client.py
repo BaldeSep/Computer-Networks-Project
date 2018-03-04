@@ -1,13 +1,14 @@
 import socket
 import base64
 import sys
+import random
 from getpass import getpass
 from tkinter import filedialog
 from encoding_package.encoding_mod import encoder
 
 
 # Validate Client Information
-def validation(conn):
+def validation(conn, args):
 	# Packet Size Set To 2KB
 	packet_size = 2048
 	
@@ -43,12 +44,12 @@ def validation(conn):
 			
 	if signed_in == True:
 		print ('You are signed in!!!')
-		session(conn, username)
+		session(conn, username, args)
 	elif rejected == True:
 		print ('Permission denied')
 		conn.close()
 	
-def send_server_file(conn, ascii_armor, message_type, packet_size):
+def send_server_file(conn, ascii_armor, message_type, packet_size, args):
 	src_filename = filedialog.askopenfilename(title='Open Source File')
 	key_filename = filedialog.askopenfilename(title='Open Key File')
 	
@@ -72,6 +73,14 @@ def send_server_file(conn, ascii_armor, message_type, packet_size):
 			# Hash the data
 			data = e.hash_(data)
 			
+			if len(args) > 0:
+				# Will Produce Some Errors but will be recoverable
+				if args[0] == 'br':
+					pass
+				# Will produce a lot of Errors will not be recoverable
+				elif args[0] == 'cr':
+					pass
+			
 			# Get a key from the key file
 			key = key_file.read(packet_size)
 			if len(key) <= packet_size:
@@ -79,6 +88,7 @@ def send_server_file(conn, ascii_armor, message_type, packet_size):
 		
 			# Encrypt the data using XOR method
 			data = e.xor_c(data, key)
+			
 			
 			
 			# If Ascii Armoring is requested apply it to the data chunk
@@ -140,7 +150,7 @@ def send_server_file(conn, ascii_armor, message_type, packet_size):
 	src_file.close()
 	key_file.close()
 	
-def session(conn, user_name):
+def session(conn, user_name, args):
 	packet_size = 4096
 	
 	message_type = {'ascii-yes': bytes([1]),
@@ -157,13 +167,16 @@ def session(conn, user_name):
 		if conn.recv(packet_size) == message_type['ascii-yes']:
 			ascii_armor = True
 		
-		send_server_file(conn, ascii_armor, message_type, packet_size)
+		send_server_file(conn, ascii_armor, message_type, packet_size, args)
 		conn.close()	
 	except:
 		print ("ERROR: CONNECTION WILL NOW TERMINATE.")
 		
 
-def _init_socket():
+def _init_socket(args):
+	
+	args = args[1:]
+	
 	
 	# Create Socket
 	s = socket.socket()
@@ -181,13 +194,13 @@ def _init_socket():
 	s.connect((host, port))
 
 	# Enter Validation Stage
-	validation(s)	
+	validation(s, args)	
 		
 	# Close Connection After Sending Data To Server
 	s.close()
 
 if __name__ == '__main__':
-	_init_socket()
+	_init_socket(sys.argv)
 
 
 
