@@ -1,0 +1,1 @@
+This directory will contain the key that will be used during the presentation and it will be the destination directory for the file to be tranferred
