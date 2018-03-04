@@ -2,8 +2,15 @@
 
 ## Setup
 
+1. Make sure you have Python 3.5.2 or above already installed on your computer.
+1. Tested on GNU/Linux using Python 3.5.2 may work with earlier versions of
+python but not guaranteed to work.  
 1. Run client.py on the computer that you intend to send the data file from.
-2. Run server.py on the computer that you intend to receive the data on.
+1. Run server.py on the computer that you intend to receive the data on.
+1. All interaction with the exception of the dialog prompts will be done
+through the command line interface prompt.
+1. A gui will be used so make sure you have an OS/OS Version that has a way
+to display a gui. 
 
 ### client.py
   - When you run this program it will prompt you for a host IP address, enter
