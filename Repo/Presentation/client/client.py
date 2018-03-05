@@ -74,12 +74,17 @@ def send_server_file(conn, ascii_armor, message_type, packet_size, args):
 			data = e.hash_(data)
 			
 			if len(args) > 0:
+				random_num = int(random.random() * 100)
 				# Will Produce Some Errors but will be recoverable
 				if args[0] == 'br':
-					pass
+					if random_num <= 15:
+						for i in data:
+							print(i)
 				# Will produce a lot of Errors will not be recoverable
 				elif args[0] == 'cr':
-					pass
+					if random_num > 15:
+						for i in data:
+							print(i)
 			
 			# Get a key from the key file
 			key = key_file.read(packet_size)
@@ -138,14 +143,12 @@ def send_server_file(conn, ascii_armor, message_type, packet_size, args):
 			
 			print('DONE')	
 			conn.recv(1)
-		else:
-			# Once done send a done message
-			conn.send(message_type['done'])
+			
 	except:
 		print ('ERROR: CONNECTION WILL NOW TERMINATE.')
 		conn.close()
 	
-	
+	conn.send(message_type['done'])
 	# Closes files
 	src_file.close()
 	key_file.close()

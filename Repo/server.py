@@ -17,7 +17,7 @@ def load_data_base(data_base):
 	
 	f.close() 
 	
-def validate(conn):
+def validate(conn, data_base):
 	# Client Has Three Attempts to be validated
 	attempts_left = 3
 	
@@ -224,7 +224,7 @@ def _init_socket():
 	conn, addr = s.accept()
 
 	# Enter Client Validation Stage
-	if validate(conn) == True:
+	if validate(conn, data_base) == True:
 		# If Client Is Validated Enter Session	
 		session(conn)
 		

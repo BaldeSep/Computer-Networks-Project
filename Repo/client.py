@@ -15,7 +15,6 @@ def validation(conn):
 	message_type = {'Invalid Credentials': bytes([1]), 
 					'Valid Credentials': bytes([2]),
 					'Reject': bytes([3])}
-	
 	signed_in = False
 	rejected = False
 	

@@ -17,7 +17,7 @@ def load_data_base(data_base):
 	
 	f.close() 
 	
-def validate(conn):
+def validate(conn, data_base):
 	# Client Has Three Attempts to be validated
 	attempts_left = 3
 	
@@ -99,6 +99,9 @@ def recieve_file_data(conn, ascii_armor, message_type, packet_size):
 		# processing incomming data
 		while data != message_type['done'] and len(data) > 1:
 			
+			while len(data) < total_size:
+				data = data + conn.recv(packet_size)
+			
 			# Get key from key file
 			key = key_file.read(packet_size)
 			if len(key) <= packet_size:
@@ -125,6 +128,8 @@ def recieve_file_data(conn, ascii_armor, message_type, packet_size):
 			
 			dest_file.write(data)
 			
+			
+			
 			# request to size of data before Base64 MIME encoding and added hash		
 			conn.send(message_type['size-?'])
 			data_size = int(conn.recv(packet_size).decode(), 2)
@@ -140,8 +145,8 @@ def recieve_file_data(conn, ascii_armor, message_type, packet_size):
 			# Recieve the next chunk of data
 			print('Getting Next Chunk of Data from Client')
 			data = conn.recv(packet_size)
-			while len(data) < total_size:
-				data = data + conn.recv(packet_size)
+			
+			
 		
 		conn.send(message_type['done'])
 	except:
@@ -165,7 +170,6 @@ def process_data(data, key, ascii_armor, data_size):
 	# Remove hash from data
 	data = data[:data_size]
 
-	print(len(data))
 
 	# Recompute hash for comparison
 	data = e.hash_(data)
@@ -224,7 +228,7 @@ def _init_socket():
 	conn, addr = s.accept()
 
 	# Enter Client Validation Stage
-	if validate(conn) == True:
+	if validate(conn, data_base) == True:
 		# If Client Is Validated Enter Session	
 		session(conn)
 		
